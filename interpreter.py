@@ -42,7 +42,7 @@ class Interpreter(object):
             return token
         self.error()
 
-    def replace(self, token_type):
+    def replace_token(self, token_type):
         if self.current_token.type == token_type:
             self.current_token = self.get_next_token()
         else:
@@ -51,11 +51,11 @@ class Interpreter(object):
     def expr(self):
         self.current_token = self.get_next_token()
         left = self.current_token
-        self.replace(INTEGER)
+        self.replace_token(INTEGER)
         op = self.current_token
-        self.replace(PLUS)
+        self.replace_token(PLUS)
         right = self.current_token
-        self.replace(INTEGER)
+        self.replace_token(INTEGER)
         result = left.value + right.value
         return result
 
