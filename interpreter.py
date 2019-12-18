@@ -1,6 +1,8 @@
 # pascal interpreter implemented in python3
 
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER = 'INTEGER'
+PLUS = 'PLUS'
+EOF = 'EOF'
 
 
 class Token(object):
