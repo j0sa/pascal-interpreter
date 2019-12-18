@@ -128,7 +128,7 @@ def main():
     while True:
         try:
             # text from cl
-            text = raw_input('calc> ')
+            text = input('calc> ')
         except EOFError:
             break
         if not text:
