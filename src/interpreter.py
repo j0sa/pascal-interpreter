@@ -71,21 +71,22 @@ class Interpreter(object):
         else:
             self.error()
 
+    def term(self):
+        token = self.current_token
+        self.replace_token(INTEGER)
+        return token.value
+
     def expr(self):
         self.current_token = self.get_next_token()
-        left = self.current_token
-        self.replace_token(INTEGER)
-        operator = self.current_token
-        if operator.type == PLUS:
-            self.replace_token(PLUS)
-        else:
-            self.replace_token(MINUS)
-        right = self.current_token
-        self.replace_token(INTEGER)
-        if operator.type == PLUS:
-            result = left.value + right.value
-        else:
-            result = left.value - right.value
+        result = self.term()
+        while self.current_token.type in (PLUS, MINUS):
+            token = self.current_token
+            if token.type == PLUS:
+                self.replace_token(PLUS)
+                result = result + self.term()
+            elif token.type == MINUS:
+                self.replace_token(MINUS)
+                result = result - self.term()
         return result
 
 
