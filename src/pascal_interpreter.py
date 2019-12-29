@@ -1,4 +1,4 @@
-# An interpreter for the Pascal prohramming language implemented in Python3
+# An interpreter for the Pascal programming language implemented in Python3
 
 INTEGER, PLUS, MINUS, MUL, DIV, EOF = (
     'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF'
