@@ -1,9 +1,8 @@
-# pascal interpreter implemented in python3
+# An interpreter for the Pascal prohramming language implemented in Python3
 
-INTEGER = 'INTEGER'
-PLUS = 'PLUS'
-MINUS = 'MINUS'
-EOF = 'EOF'
+INTEGER, PLUS, MINUS, MUL, DIV, EOF = (
+    'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF'
+)
 
 
 class Token(object):
@@ -21,17 +20,16 @@ class Token(object):
         return self.__str__()
 
 
-class Interpreter(object):
+class Lexer(object):
     def __init__(self, text):
         self.text = text
         self.pos = 0
-        self.current_token = None
         self.current_char = self.text[self.pos]
 
     def error(self):
-        raise Exception('Unable to parse input.')
+        raise Exception('Invalid character')
 
-    def move_forward(self):
+    def advance(self):
         self.pos += 1
         if self.pos > len(self.text) - 1:
             self.current_char = None
@@ -40,45 +38,82 @@ class Interpreter(object):
 
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
-            self.move_forward()
+            self.advance()
 
     def integer(self):
         result = ''
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
-            self.move_forward()
+            self.advance()
         return int(result)
 
     def get_next_token(self):
         while self.current_char is not None:
+
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
+
             if self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
+
             if self.current_char == '+':
-                self.move_forward()
+                self.advance()
                 return Token(PLUS, '+')
+
             if self.current_char == '-':
-                self.move_forward()
+                self.advance()
                 return Token(MINUS, '-')
+
+            if self.current_char == '*':
+                self.advance()
+                return Token(MUL, '*')
+
+            if self.current_char == '/':
+                self.advance()
+                return Token(DIV, '/')
+
             self.error()
+
         return Token(EOF, None)
+
+
+class Interpreter(object):
+    def __init__(self, lexer):
+        self.lexer = lexer
+        self.current_token = self.lexer.get_next_token()
+
+    def error(self):
+        raise Exception('Invalid syntax')
 
     def replace_token(self, token_type):
         if self.current_token.type == token_type:
-            self.current_token = self.get_next_token()
+            self.current_token = self.lexer.get_next_token()
         else:
             self.error()
 
-    def term(self):
+    def factor(self):
         token = self.current_token
         self.replace_token(INTEGER)
         return token.value
 
+    def term(self):
+        result = self.factor()
+
+        while self.current_token.type in (MUL, DIV):
+            token = self.current_token
+            if token.type == MUL:
+                self.replace_token(MUL)
+                result = result * self.factor()
+            elif token.type == DIV:
+                self.replace_token(DIV)
+                result = result / self.factor()
+
+        return result
+
     def expr(self):
-        self.current_token = self.get_next_token()
         result = self.term()
+
         while self.current_token.type in (PLUS, MINUS):
             token = self.current_token
             if token.type == PLUS:
@@ -87,6 +122,7 @@ class Interpreter(object):
             elif token.type == MINUS:
                 self.replace_token(MINUS)
                 result = result - self.term()
+
         return result
 
 
@@ -98,7 +134,8 @@ def main():
             break
         if not text:
             continue
-        interpreter = Interpreter(text)
+        lexer = Lexer(text)
+        interpreter = Interpreter(lexer)
         result = interpreter.expr()
         print(result)
 
