@@ -129,7 +129,7 @@ class Interpreter(object):
 def main():
     while True:
         try:
-            text = input('> ')
+            text = input('> ') #specifi  for python3, use textinput for python2
         except EOFError:
             break
         if not text:
